@@ -4,6 +4,10 @@ import Navbar from "./components/navbar/Navbar"
 import Home from "./pages/home/Home"
 import Cadastro from "./pages/cadastro/Cadastro"
 import Login from "./pages/login/Login"
+import FormTema from "./components/temas/formtema/FormTema"
+import DeletarTema from "./components/temas/deletartema/DeletarTema"
+import { AuthProvider } from "./contexts/AuthContexts"
+import ListaTemas from "./components/temas/listartemas/ListaTemas"
 
 function App() {
   // Código TypeScript
@@ -11,18 +15,30 @@ function App() {
   return (
     // Código TSX => HTML + CSS
     <>
-      <BrowserRouter>
-        <Navbar />
-        <div className="min-h-[80vh]">
-          <Routes>
-            <Route path="/" element={<Cadastro />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/cadastro" element={<Cadastro />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </div>
-        <Footer />
-      </BrowserRouter>
+      {/* 
+          Envolvemos todos os Componentes inseridos no Componente App, 
+          com o Componente AuthProvider. 
+          Desta forma, todos os Componentes dentro dele, terão acesso 
+          aos Estados e Funções guardados na context.
+      */}
+      <AuthProvider>
+        <BrowserRouter>
+          <Navbar />
+          <div className="min-h-[80vh]">
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/cadastro" element={<Cadastro />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/temas" element={<ListaTemas />} />
+              <Route path="/cadastrartema" element={<FormTema />} />
+              <Route path="/editartema/:id" element={<FormTema />} />
+              <Route path="/deletartema/:id" element={<DeletarTema />} />
+            </Routes>
+          </div>
+          <Footer />
+        </BrowserRouter>
+      </AuthProvider>
     </>
   )
 }
