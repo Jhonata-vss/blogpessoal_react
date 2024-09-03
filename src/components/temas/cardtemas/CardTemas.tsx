@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-import Tema from '../../../models/Tema'
-
+import Tema from '../../../model/Tema'
 
 /**
  * Criamos uma interface CardTemasProps, que especifica todas as propriedades 
