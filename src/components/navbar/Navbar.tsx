@@ -31,20 +31,16 @@ function Navbar() {
      */
     function logout() {
         handleLogout()
-        ToastAlerta('O usuário foi desconectado com sucesso!', 'info')
+        ToastAlerta("Usuário foi desconectado com sucesso!", "sucesso")
         navigate('/')
     }
 
     let component: ReactNode;
 
-    if (usuario.token !== ""){
-
+    if (usuario.token !== "") {
         component = (
-
             <div className='flex justify-center bg-indigo-900 py-4 w-full text-white'>
-
                 <div className="flex justify-between text-lg container">
-
                     <Link to='/home' className="font-bold text-2xl">Blog Pessoal</Link>
 
                     <div className='flex gap-4'>
@@ -64,7 +60,7 @@ function Navbar() {
 
     return (
         <>
-            { component }
+            {component}
         </>
     )
 }

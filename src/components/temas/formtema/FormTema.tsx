@@ -1,188 +1,129 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { atualizar, buscar, cadastrar } from "../../../services/Service";
-import { RotatingLines } from "react-loader-spinner";
-import { ToastAlerta } from "../../../utils/ToastAlerta";
-import AuthContext from "../../../contexts/AuthContexts";
-import Tema from "../../../model/Tema";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import Tema from '../../../model/Tema';
+import { atualizar, buscar, cadastrar } from '../../../services/Service';
+import { RotatingLines } from 'react-loader-spinner';
+import { ToastAlerta } from '../../../utils/ToastAlerta';
+import AuthContext from '../../../contexts/AuthContexts';
 
-function FormTema() {
+function FormularioTema() {
 
-    const navigate = useNavigate()
+const navigate = useNavigate();
+const [tema,setTema] = useState<Tema>({} as Tema)
+const [isLoading,setIsLoading] = useState<boolean>(false)
+const {handleLogout,usuario} = useContext(AuthContext);
+const token = usuario.token;
+const { id } = useParams<{ id:string }>();
 
-    const [tema, setTema] = useState<Tema>({} as Tema);
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+async function buscarPorId(id:string) {
+    try {
+        await buscar(`/temas/${id}`,setTema, {
+            headers: {Authorization:token}
+        });
+      } catch (error:any) {
+        if(error.toString().includes('401')) {
+            handleLogout();
+        }
+      }
+}
 
-    const { usuario, handleLogout } = useContext(AuthContext)
-    const token = usuario.token
+useEffect(() => {
+    if(id !== undefined) {
+        buscarPorId(id);
+    }
+  },[id])
 
-    /**
-     * Acessamos o parâmetro id, enviado dentro da URL da rota editartema, 
-     * através do Hook useParams.
-     * 
-     * A variável id, estará presente na URL da rota do Componente FormTema, 
-     * sempre que o usuário clicar no botão Editar, de qualquer um dos Cards 
-     * do Componente ListaTemas, indicando uma atualização nos dados de um tema. 
-     * 
-     * O Hook useParams, da Biblioteca React Router DOM possui 2 parâmetros:
-     * 
-     * const { id }: Usando a desestruturação de objetos, extraímos o valor do 
-     * parâmetro "id" da URL e atribuimos à variável id. O { id } corresponde 
-     * ao nome do parâmetro que será acessado.
-     * 
-     * useParams<{ id: string }>(): Utilizamos o Hook useParams, para acessar 
-     * o parâmetro id, na URL da rota. Observe que o parâmetro id, foi tipado 
-     * como string, porque a URL é uma string.
-     */
-    const { id } = useParams<{ id: string }>()
+useEffect(() => {
+    if(token === '') {
+      ToastAlerta('Você precisa estar logado','info');
+      navigate('/')
+    }
+  },[token])
 
-    async function buscarPorId(id: string) {
+function retornar() {
+    navigate('/temas')
+}
+
+function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+    setTema({
+      ...tema,
+      // Como o target name é igual o nome da propriedade,podemos manter o mesmo nome do input
+      [e.target.name] : e.target.value
+    })
+} 
+
+async function gerarNovoTema (e: FormEvent<HTMLFormElement>){
+      e.preventDefault()
+
+      setIsLoading(true)
+      // Checar se é uma atualização ou se é um novo cadastro
+
+      if (id !== undefined) {
         try {
-            await buscar(`/temas/${id}`, setTema, {
-                headers: { Authorization: token }
-            })
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout()
+            await atualizar('/temas',tema,setTema, {
+                headers: {Authorization:token}
+            });
+            ToastAlerta('Tema atualizado com sucesso','sucesso');
+    
+          } catch (error:any) {
+            if(error.toString().includes('403')) {
+                handleLogout();
             }
-        }
-    }
+          }
 
-    useEffect(() => {
-        if (token === '') {
-            ToastAlerta('Você precisa estar logado!', 'info')
-            navigate('/')
-        }
-    }, [token])
-
-    /**
-     * Este useEffect executará a função buscarPorId(id), sempre que 
-     * o valor da variável id for modificado. Na prática, todas as 
-     * vezes que o usuário clicar no botão Editar de qualquer CardTemas,
-     * o id do tema será passado na URL da rota, caracterizando uma 
-     * mudança no valor da variável id, executando a função buscarPorId(id). 
-     * Os dados obtidos na Resposta da Requisição, serão utilizados para 
-     * preencher os campos do Fomulário Tema, no modo Editar Tema.
-     */
-    useEffect(() => {
-        if (id !== undefined) {
-            buscarPorId(id)
-        }
-    }, [id])
-
-    function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-        setTema({
-            ...tema,
-            [e.target.name]: e.target.value
-        })
-    }
-
-    function retornar() {
-        navigate('/temas')
-    }
-
-    /**
-     * Criamos a função gerarNovoTema, responsável por criar e 
-     * atualizar os temas da aplicação.
-     * 
-     * Atravás de um Laço Condicional, a função verificará se a 
-     * variável id é diferente de undefined:
-     * 
-     * - Se for diferente de undefined, a função assume que se 
-     *   trata da atualização de um tema existente (PUT). 
-     * 
-     * - Se não for diferente de undefined, a função assume que se 
-     *   trata da criação de um novo tema (POST).
-     */
-    async function gerarNovoTema(e: ChangeEvent<HTMLFormElement>) {
-        e.preventDefault()
-        setIsLoading(true)
-
-        if (id !== undefined) {
-
-            try {
-                await atualizar(`/temas`, tema, setTema, {
-                    headers: { 'Authorization': token }
-                });
-                ToastAlerta('Tema atualizado com sucesso!', 'sucesso');
-            } catch (error: any) {
-                if (error.toString().includes('401')) {
-                    handleLogout()
-                } else {
-                    ToastAlerta('Erro ao atualizar o Tema!', 'erro')
-                }
+      } else {
+        try {
+            await cadastrar('/temas',tema,setTema, {
+                headers: {Authorization:token}
+            });
+            ToastAlerta('Tema cadastrado com sucesso','sucesso');
+    
+          } catch (error:any) {
+            if(error.toString().includes('403')) {
+                handleLogout();
             }
+          }
+      }
+      setIsLoading(false)
+      retornar();
+    } 
+  
+  
+  return (
 
-        } else {
-
-            try {
-                await cadastrar(`/temas`, tema, setTema, {
-                    headers: { 'Authorization': token }
-                });
-                ToastAlerta('Tema cadastrado com sucesso!', 'sucesso');
-            } catch (error: any) {
-                if (error.toString().includes('401')) {
-                    handleLogout()
-                } else {
-                    ToastAlerta('Erro ao cadastrar o Tema!', 'erro')
-                }
-            }
-
-        }
-
-        setIsLoading(false)
-        retornar()
-    }
-
-    return (
-        <div className="flex flex-col justify-center items-center mx-auto container">
-            <h1 className="my-8 text-4xl text-center">
-
-                {/* 
-                    Através de uma Expressão Ternária, utilizaremos a variável id 
-                    para definir se o título do formulário será Cadastrar Tema ou 
-                    Editar Tema, indicando os respectivos processos:
-                    
-                    - Se o id estiver com o valor undefined, exibiremos o texto 
-                      Cadastrar Tema;
-                    
-                    - Caso contrário, exibiremos o texto Editar Tema.
-                */}
-                {id === undefined ? 'Cadastrar Tema' : 'Editar Tema'}
+    <div className="container flex flex-col items-center justify-center mx-auto">
+            <h1 className="text-4xl text-center my-8">
+                {id=== undefined ? 'Cadastrar tema' : 'Editar Tema'}
             </h1>
 
-            <form className="flex flex-col gap-4 w-1/2"
-                onSubmit={gerarNovoTema}
-            >
+            <form onSubmit={gerarNovoTema} className="w-1/2 flex flex-col gap-4" >
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="descricao">Descrição do Tema</label>
+                    <label htmlFor="descricao">Descrição do tema</label>
                     <input
                         type="text"
-                        placeholder="Descreva aqui seu tema"
+                        placeholder="Descrição"
                         name='descricao'
-                        className="border-2 border-slate-700 p-2 rounded"
+                        className="border-2 border-slate-700 rounded p-2"
                         value={tema.descricao}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+                        onChange = {(e:ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+
                     />
                 </div>
                 <button
-                    className="flex justify-center bg-indigo-400 hover:bg-indigo-800 mx-auto py-2 rounded w-1/2 text-slate-100"
+                    className="rounded text-slate-100 bg-indigo-400 hover:bg-indigo-800 w-1/2 py-2 mx-auto block flex justify-center"
                     type="submit">
-
-                    {isLoading ? <RotatingLines
+                   {isLoading ?
+                        <RotatingLines 
                         strokeColor="white"
                         strokeWidth="5"
                         animationDuration="0.75"
                         width="24"
-                        visible={true}
-                    /> :
-                        <span>{id === undefined ? 'Cadastrar' : 'Atualizar'}</span>
-                    }
-
+                        visible={true}/> :
+                        <span>{id === undefined ? 'Cadastrar' : 'Atualizar'}</span>}
                 </button>
             </form>
-        </div>
-    );
+    </div>
+  )
 }
 
-export default FormTema;
+export default FormularioTema

@@ -9,15 +9,11 @@ import Tema from "../../../model/Tema";
 function DeletarTema() {
 
     const navigate = useNavigate()
-
     const [tema, setTema] = useState<Tema>({} as Tema);
     const [isLoading, setIsLoading] = useState<boolean>(false)
-
     const { usuario, handleLogout } = useContext(AuthContext)
     const token = usuario.token
-
     const { id } = useParams<{ id: string }>()
-
     async function buscarPorId(id: string) {
         try {
             await buscar(`/temas/${id}`, setTema, {
@@ -58,11 +54,11 @@ function DeletarTema() {
             await deletar(`/temas/${id}`, {
                 headers: { Authorization: token }
             })
-            ToastAlerta('O Tema foi apagado com sucesso!', 'sucesso')
+            ToastAlerta('O Tema foi apagado com sucesso!','sucesso')
         } catch (error: any) {
             if (error.toString().includes('401')) {
                 handleLogout()
-            }else{
+            } else {
                 ToastAlerta('Erro ao Excluir o Tema!', 'erro')
             }
         }
@@ -77,31 +73,31 @@ function DeletarTema() {
             <p className='mb-4 font-semibold text-center'>
                 Você tem certeza de que deseja apagar o tema a seguir?</p>
             <div className='flex flex-col justify-between border rounded-2xl overflow-hidden'>
-                <header 
+                <header
                     className='bg-indigo-600 px-6 py-2 font-bold text-2xl text-white'>
                     Tema
                 </header>
                 <p className='bg-slate-200 p-8 h-full text-3xl'>{tema.descricao}</p>
                 <div className="flex">
-                    <button 
+                    <button
                         className='bg-red-400 hover:bg-red-600 py-2 w-full text-slate-100'
                         onClick={retornar}
-                        >
+                    >
                         Não
                     </button>
-                    <button 
+                    <button
                         className='flex justify-center items-center bg-indigo-400 hover:bg-indigo-600 w-full text-slate-100'
                         onClick={deletarTema}
-                        >
+                    >
                         {isLoading ? <RotatingLines
-                        strokeColor="white"
-                        strokeWidth="5"
-                        animationDuration="0.75"
-                        width="24"
-                        visible={true}
-                    /> :
-                        <span>Sim</span>
-                    }
+                            strokeColor="white"
+                            strokeWidth="5"
+                            animationDuration="0.75"
+                            width="24"
+                            visible={true}
+                        /> :
+                            <span>Sim</span>
+                        }
                     </button>
                 </div>
             </div>

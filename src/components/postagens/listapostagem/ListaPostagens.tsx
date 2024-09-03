@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react"
 import CardPostagem from "../cardpostagem/CardPostagem"
+import Postagem from "../../../model/Postagem"
 import { useNavigate } from "react-router-dom";
 import { buscar } from "../../../services/Service";
 import { DNA } from "react-loader-spinner";
-import Postagem from "../../../model/Postagem";
-import AuthContext from "../../../contexts/AuthContexts";
 import { ToastAlerta } from "../../../utils/ToastAlerta";
+import AuthContext from "../../../contexts/AuthContexts";
 
 
 function ListaPostagens() {
@@ -22,7 +22,7 @@ function ListaPostagens() {
     // Caso contrário, significa que o usuário não logou ou já fez o logout
     useEffect(() => {
         if(token === '') {
-            alert('Você precisa estar logado');
+            ToastAlerta('Você precisa estar logado','info');
             navigate('/')
         }
     },[token]);
@@ -36,18 +36,11 @@ function ListaPostagens() {
             });
         } catch (error:any) {
             if(error.toString().includes('403')) {
-                alert('O token expirou,favor logar novamente')
+                ToastAlerta('O token expirou,favor logar novamente','info')
                 handleLogout()
             }
         }
     }
-
-    useEffect(() => {
-        if (token === '') {
-            ToastAlerta('Você precisa estar logado', 'info')
-            navigate('/');
-        }
-    }, [token])
 
     useEffect(() => {
         buscarPostagens();
