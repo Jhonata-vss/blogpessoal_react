@@ -4,29 +4,24 @@ import Navbar from './components/navbar/Navbar'
 import Home from './pages/home/Home'
 import Cadastro from './pages/cadastro/Cadastro'
 import Login from './pages/login/Login'
-import { AuthProvider } from './contexts/AuthContexts'
-import FormularioTema from './components/temas/formtema/FormTema'
+import FormularioTema from './components/temas/formulariotema/FormularioTema'
 import ListaTemas from './components/temas/listartemas/ListaTemas'
 import DeletarTema from './components/temas/deletartema/DeletarTema'
 import ListaPostagens from './components/postagens/listapostagem/ListaPostagens'
 import DeletarPostagem from './components/postagens/deletarpostagem/DeletarPostagem'
 import FormularioPostagem from './components/postagens/formulariopostagem/FormularioPostagem'
 import Perfil from './pages/perfil/Perfil'
-
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify'
+import { AuthProvider } from './contexts/AuthContexts'
 
 function App() {
-  // Código TypeScript
-
+  //Código Typescript
   return (
-    // Código TSX => HTML + CSS
-    <>
-      {/* 
-          Envolvemos todos os Componentes inseridos no Componente App, 
-          com o Componente AuthProvider. 
-          Desta forma, todos os Componentes dentro dele, terão acesso 
-          aos Estados e Funções guardados na context.
-      */}
-      <AuthProvider>
+  // Código TSX - HTML e CSS
+  <>
+  <AuthProvider>
+    <ToastContainer/>
     <BrowserRouter>
           <Navbar/>
           <div className="min-h-[80vh]">
@@ -49,7 +44,7 @@ function App() {
           <Footer/>
       </BrowserRouter>
   </AuthProvider>
-    </>
+  </>
   )
 }
 

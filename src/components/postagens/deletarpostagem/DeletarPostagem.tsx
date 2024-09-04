@@ -1,13 +1,14 @@
 import { useState, useContext, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+import Postagem from "../../../model/Postagem"
 import { buscar, deletar } from "../../../services/Service"
 import { RotatingLines } from "react-loader-spinner"
 import { ToastAlerta } from "../../../utils/ToastAlerta"
 import AuthContext from "../../../contexts/AuthContexts"
-import Postagem from "../../../model/Postagem"
 
 function DeletarPostagem() {
 
+   
     const navigate = useNavigate()
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -34,8 +35,8 @@ function DeletarPostagem() {
 
     useEffect(() => {
         if (token === '') {
-            ToastAlerta('Você precisa estar logado', 'info')
-            navigate('/')
+            ToastAlerta('Você precisa estar logado','info')
+            navigate('/login')
         }
     }, [token])
 
@@ -55,13 +56,13 @@ function DeletarPostagem() {
                 }
             })
 
-            ToastAlerta('Postagem apagada com sucesso', 'sucesso')
+            ToastAlerta('Postagem apagada com sucesso','sucesso')
 
         } catch (error: any) {
             if (error.toString().includes('403')) {
                 handleLogout()
             }else {
-                ToastAlerta('Erro ao deletar a postagem.', 'erro')
+                ToastAlerta('Erro ao deletar a postagem','erro')
             }
         }
 
@@ -72,32 +73,24 @@ function DeletarPostagem() {
     function retornar() {
         navigate("/postagens")
     }
-    
+
     return (
-        <div className='mx-auto w-1/3 container'>
-            <h1 className='my-4 text-4xl text-center'>Deletar Postagem</h1>
-
-            <p className='mb-4 font-semibold text-center'>
-                Você tem certeza de que deseja apagar a postagem a seguir?
-            </p>
-
-            <div className='flex flex-col justify-between border rounded-2xl overflow-hidden'>
-                <header 
-                    className='bg-indigo-600 px-6 py-2 font-bold text-2xl text-white'>
-                    Postagem
-                </header>
+        <div className='container w-1/3 mx-auto'>
+            <h1 className='text-4xl text-center my-4'>Deletar postagem</h1>
+    
+            <p className='text-center font-semibold mb-4'>Você tem certeza de que deseja apagar a postagem a seguir?</p>
+    
+            <div className='border flex flex-col rounded-2xl overflow-hidden justify-between'>
+                <header className='py-2 px-6 bg-indigo-600 text-white font-bold text-2xl'>Postagem</header>
                 <div className="p-4">
-                    <p className='h-full text-xl'>{postagem.titulo}</p>
+                    <p className='text-xl h-full'>{postagem.titulo}</p>
                     <p>{postagem.texto}</p>
                 </div>
                 <div className="flex">
+                    <button className='text-slate-100 bg-red-400 hover:bg-red-600 w-full py-2' onClick={retornar}>Não</button>
                     <button 
-                        className='bg-red-400 hover:bg-red-600 py-2 w-full text-slate-100'
-                        onClick={retornar}>
-                        Não
-                    </button>
-                    <button 
-                        className='flex justify-center items-center bg-indigo-400 hover:bg-indigo-600 w-full text-slate-100'
+                        className='w-full text-slate-100 bg-indigo-400 
+                        hover:bg-indigo-600 flex items-center justify-center'
                         onClick={deletarPostagem}>
                         
                         {isLoading ?
@@ -113,8 +106,8 @@ function DeletarPostagem() {
                     </button>
                 </div>
             </div>
-        </div>
-    )
+      </div>
+  )
 }
 
 export default DeletarPostagem
